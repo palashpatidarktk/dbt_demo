@@ -1,0 +1,57 @@
+name: workflows migration prd
+
+concurrency: "1"
+
+on:
+  push:
+    branches:
+      - promote_workflows_prd
+    paths:
+      - "**/*.yml"
+      - "**/*.py"
+
+jobs:
+  deploy:
+    name: "Deploy bundle"
+    runs-on: ubuntu-latest
+    environment: prd
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: databricks/setup-cli@main
+
+      - run: databricks bundle deploy
+        working-directory: .
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DAB_SECRET }}
+          DATABRICKS_BUNDLE_ENV: prd
+#
+#   pipeline_update:
+#     name: "Run pipeline update"
+#     runs-on: ubuntu-latest
+
+#     needs:
+    #   - deploy
+    # if: github.ref == 'refs/heads/promote_workflows_prd'  
+
+#     steps:
+#       - uses: actions/checkout@v3
+
+# #       - uses: actions/setup-python@v4
+# #         with:
+# #           python-version: 3.11
+# #           cache: 'pip'
+
+# #       - run: pip install -r requirements.txt
+# #         working-directory: .github/support
+
+#       - uses: databricks/setup-cli@main
+
+#       # - shell: bash
+#       #   name: Run pipeline update
+#       #   run: |
+#       #     set -o pipefail
+#       #     databricks bundle run dab_kontest_job --refresh-all 2>&1 | tee output.log
+#       #   env:
+#       #     DATABRICKS_TOKEN: ${{ secrets.DAB_SECRET }}
+#       #     DATABRICKS_BUNDLE_ENV: dev
