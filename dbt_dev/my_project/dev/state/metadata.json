@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "config": {
+    "bundle": {
+      "git": {
+        "bundle_root_path": "."
+      }
+    },
+    "workspace": {
+      "file_path": "/dbt_dev/my_project/dev/files"
+    },
+    "resources": {
+      "jobs": {
+        "dbt": {
+          "id": "252851455659991",
+          "relative_path": "resources/my_project_job.yml"
+        }
+      }
+    }
+  }
+}
