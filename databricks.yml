@@ -16,7 +16,7 @@ targets:
     #mode: development
     default: true
     workspace:
-      # root_path: /dbt_dev/${bundle.name}/${bundle.target}
+      root_path: /dbt_dev/${bundle.name}/${bundle.target}
       host: https://adb-8145217464581202.2.azuredatabricks.net
 
   ## Optionally, there could be a 'staging' target here.
