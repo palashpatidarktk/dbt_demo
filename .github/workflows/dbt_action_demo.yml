@@ -1,30 +1,30 @@
-name: workflows migration prd
+# name: workflows migration prd
 
-concurrency: "1"
+# concurrency: "1"
 
-on:
-  push:
-    branches:
-      - promote_workflows_prd
-    paths:
-      - "**/*.yml"
-      - "**/*.py"
+# on:
+#   push:
+#     branches:
+#       - promote_workflows_prd
+#     paths:
+#       - "**/*.yml"
+#       - "**/*.py"
 
-jobs:
-  deploy:
-    name: "Deploy bundle"
-    runs-on: ubuntu-latest
-    environment: prd
-    steps:
-      - uses: actions/checkout@v3
+# jobs:
+#   deploy:
+#     name: "Deploy bundle"
+#     runs-on: ubuntu-latest
+#     environment: prd
+#     steps:
+#       - uses: actions/checkout@v3
 
-      - uses: databricks/setup-cli@main
+#       - uses: databricks/setup-cli@main
 
-      - run: databricks bundle deploy
-        working-directory: .
-        env:
-          DATABRICKS_TOKEN: ${{ secrets.DAB_SECRET }}
-          DATABRICKS_BUNDLE_ENV: prd
+#       - run: databricks bundle deploy
+#         working-directory: .
+#         env:
+#           DATABRICKS_TOKEN: ${{ secrets.DAB_SECRET }}
+#           DATABRICKS_BUNDLE_ENV: prd
 #
 #   pipeline_update:
 #     name: "Run pipeline update"
@@ -34,16 +34,7 @@ jobs:
     #   - deploy
     # if: github.ref == 'refs/heads/promote_workflows_prd'  
 
-#     steps:
-#       - uses: actions/checkout@v3
-
-# #       - uses: actions/setup-python@v4
-# #         with:
-# #           python-version: 3.11
-# #           cache: 'pip'
-
-# #       - run: pip install -r requirements.txt
-# #         working-directory: .github/support
+#  
 
 #       - uses: databricks/setup-cli@main
 
@@ -55,3 +46,40 @@ jobs:
 #       #   env:
 #       #     DATABRICKS_TOKEN: ${{ secrets.DAB_SECRET }}
 #       #     DATABRICKS_BUNDLE_ENV: dev
+
+# name: hello-world
+# on: push
+# jobs:
+#   my-job:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: my-step
+#         run: echo "Hello World!"
+
+name: workflows migration dev
+
+concurrency: "1"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "**/*.yml"
+      - "**/*.py"
+
+jobs:
+  deploy:
+    name: "Deploy bundle"
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: databricks/setup-cli@main
+
+      - run: databricks bundle deploy --target dev --profile adb-8145217464581202
+        # working-directory: .
+        # env:
+        #   DATABRICKS_TOKEN: 
+        #   DATABRICKS_BUNDLE_ENV: prd
