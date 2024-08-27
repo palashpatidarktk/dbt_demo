@@ -78,8 +78,8 @@ jobs:
 
       - uses: databricks/setup-cli@main
 
-      - run: databricks bundle deploy --target dev --profile adb-8145217464581202
-        # working-directory: .
-        # env:
-        #   DATABRICKS_TOKEN: 
-        #   DATABRICKS_BUNDLE_ENV: prd
+      - run: databricks bundle deploy --profile adb-8145217464581202
+        working-directory: .
+        env:
+          DATABRICKS_TOKEN: ${{secrets.DAB_SECRET}}
+          DATABRICKS_BUNDLE_ENV: dev
