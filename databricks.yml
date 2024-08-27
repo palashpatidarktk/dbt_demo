@@ -4,7 +4,7 @@ bundle:
   name: my_project
 
 include:
-  - resources/*_job.yml
+  - resources/*job.yml
 
 targets:
   # The 'dev' target, for development purposes. This target is the default.
