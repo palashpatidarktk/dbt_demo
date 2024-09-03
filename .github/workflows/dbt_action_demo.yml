@@ -89,13 +89,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # - name: Set up Databricks CLI
-      #   uses: databrickslabs/ci-databricks-cli-action@v1
-      #   with:
-      #     databricks-host: ${{ secrets.DATABRICKS_HOST }}
-      #     databricks-token: ${{ secrets.DATABRICKS_TOKEN }}
       - name: Set up Databricks CLI
-        uses: databricks/setup-cli@main
+        run: |
+          pip install databricks-cli
+          databricks configure --token
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+
+      # - name: Set up Databricks CLI
+      #   uses: databricks/setup-cli@main
 
       - name: Trigger Databricks testing job
         id: test-job
@@ -129,7 +133,7 @@ jobs:
             fi
         working-directory: .
         env:
-            DATABRICKS_TOKEN: ${{secrets.DAB_SECRET}}
+            DAB_SECRET: ${{secrets.DAB_SECRET}}
             DATABRICKS_BUNDLE_ENV: dev
 
       # - name: Wait for test job to complete
