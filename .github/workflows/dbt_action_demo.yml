@@ -57,9 +57,7 @@
 #         run: echo "Hello World!"
 
 name: workflows migration dev
-
 concurrency: "1"
-
 on:
   push:
     branches:
@@ -67,19 +65,61 @@ on:
     paths:
       - "**/*.yml"
 
+# jobs:
+#   deploy:
+#     name: "Deploy bundle"
+#     runs-on: ubuntu-latest
+#     environment: dev
+#     steps:
+#       - uses: actions/checkout@v3
 
+#       - uses: databricks/setup-cli@main
+
+#       - run: databricks bundle deploy
+#         working-directory: .
+#         env:
+#           DATABRICKS_TOKEN: ${{secrets.DAB_SECRET}}
+#           DATABRICKS_BUNDLE_ENV: dev
 jobs:
-  deploy:
-    name: "Deploy bundle"
+  test:
+    name: "automated testing"
     runs-on: ubuntu-latest
     environment: dev
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - uses: databricks/setup-cli@main
+      # - name: Set up Databricks CLI
+      #   uses: databrickslabs/ci-databricks-cli-action@v1
+      #   with:
+      #     databricks-host: ${{ secrets.DATABRICKS_HOST }}
+      #     databricks-token: ${{ secrets.DATABRICKS_TOKEN }}
+      - name: Set up Databricks CLI
+        uses: databricks/setup-cli@main
 
-      - run: databricks bundle deploy
+      - name: Trigger Databricks testing job
+        id: test-job
+        run: |
+          job_id="63243543003442"
+          run_id=$(databricks jobs run-now --job-id $job_id | jq -r '.run_id')
+          echo "Test job run ID: $run_id"
+          echo "::set-output name=run_id::$run_id"
         working-directory: .
         env:
-          DATABRICKS_TOKEN: ${{secrets.DAB_SECRET}}
-          DATABRICKS_BUNDLE_ENV: dev
+            DATABRICKS_TOKEN: ${{secrets.DAB_SECRET}}
+            DATABRICKS_BUNDLE_ENV: dev
+
+      # - name: Wait for test job to complete
+      #   id: wait-for-test
+      #   run: |
+      #     run_id=${{ steps.test-job.outputs.run_id }}
+      #     status="RUNNING"
+      #     while [[ "$status" == "RUNNING" ]]; do
+      #       status=$(databricks runs get --run-id $run_id | jq -r '.state.result_state')
+      #       echo "Test job status: $status"
+      #       sleep 30
+      #     done
+      #     if [[ "$status" != "SUCCESS" ]]; then
+      #       echo "Test job failed with status: $status"
+      #       exit 1
+      #     fi
