@@ -102,7 +102,7 @@ jobs:
         
         run: |
             job_id="63243543003442"  # Replace with your testing job ID
-            response=$(databricks jobs run-now --job-id $job_id)
+            response=$(databricks jobs run-now $job_id)
             run_id=$(echo $response | jq -r '.run_id')
             echo "Test job run ID: $run_id"
             echo "::set-output name=run_id::$run_id"
