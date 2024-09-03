@@ -105,11 +105,28 @@ jobs:
             response=$(databricks jobs run-now $job_id)
             run_id=$(echo $response | jq -r '.run_id')
             echo "Test job run ID: $run_id"
-            echo "::set-output name=run_id::$run_id"
+            echo "RUN_ID=$run_id" >> $GITHUB_ENV
+          #  echo "::set-output name=run_id::$run_id"
           # job_id="63243543003442"
           # run_id=$(databricks jobs run-now --job-id $job_id | jq -r '.run_id')
           # echo "Test job run ID: $run_id"
           # echo "::set-output name=run_id::$run_id"
+
+      - name: Wait for test job to complete
+        id: wait-for-test
+        run: |
+            run_id=${{ env.RUN_ID }}
+            status="RUNNING"
+            while [[ "$status" == "RUNNING" ]]; do
+              response=$(databricks runs get --run-id $run_id)
+              status=$(echo $response | jq -r '.state.result_state')
+              echo "Test job status: $status"
+              sleep 10
+            done
+            if [[ "$status" != "SUCCESS" ]]; then
+              echo "Test job failed with status: $status"
+              exit 1
+            fi
         working-directory: .
         env:
             DATABRICKS_TOKEN: ${{secrets.DAB_SECRET}}
