@@ -19,7 +19,7 @@ resources:
       libraries:
         - notebook:
             #path: /Users/palash.patidar@koantekorg.onmicrosoft.com/Dummy_Load_demo/Hydrate
-            path: ../src/Notebooks/Hydrate.ipynb
+            path: ..src/Notebooks/Ingest_data.ipynb
       target: dlt_test_incr_load
       development: true
       photon: false
