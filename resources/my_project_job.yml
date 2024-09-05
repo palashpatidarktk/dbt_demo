@@ -113,7 +113,7 @@ resources:
           notebook_task:
             # notebook_path: /Workspace/Users/palash.patidar@koantekorg.onmicrosoft.com/DLT
             #   Test/Validations
-            notebook_path: ../src/Notebooks/demo_job_test
+            notebook_path: ../src/Notebooks/demo_job_test.py
             source: WORKSPACE
       queue:
         enabled: true
