@@ -4,7 +4,8 @@ bundle:
   name: my_project
 
 include:
-  - resources/*.yml
+  - resources/*_job.yml
+  - resources/*_pipeline.yml
 
 targets:
   # The 'dev' target, for development purposes. This target is the default.
