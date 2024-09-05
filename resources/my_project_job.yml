@@ -80,7 +80,7 @@ resources:
             task:
               task_key: itterator_iteration
               notebook_task:
-                notebook_path: ./scr/Ingest_data.ipynb
+                notebook_path: ../src/Notebooks/ingest_data.ipynb
                 base_parameters:
                   name: "{{input}}"
                 source: WORKSPACE
