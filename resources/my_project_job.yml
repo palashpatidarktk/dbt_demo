@@ -106,4 +106,16 @@ resources:
       queue:
         enabled: true
 
+    test_dab:
+      name: test_dab
+      tasks:
+        - task_key: dab_test
+          notebook_task:
+            # notebook_path: /Workspace/Users/palash.patidar@koantekorg.onmicrosoft.com/DLT
+            #   Test/Validations
+            notebook_path: ../src/Notebooks/demo_job_test
+            source: WORKSPACE
+      queue:
+        enabled: true
+
 
