@@ -10,3 +10,19 @@
 
 #       configuration:
 #         bundle.sourcePath: /Workspace/${workspace.file_path}/src
+
+
+resources:
+  pipelines:
+    Hydrate:
+      name: Hydrate
+      libraries:
+        - notebook:
+            #path: /Users/palash.patidar@koantekorg.onmicrosoft.com/Dummy_Load_demo/Hydrate
+            path: ../src/Notebooks/Hydrate.ipynb
+      target: dlt_test_incr_load
+      development: true
+      photon: false
+      catalog: satya_test
+      serverless: true
+      data_sampling: false
