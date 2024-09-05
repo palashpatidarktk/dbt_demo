@@ -113,8 +113,20 @@ resources:
           notebook_task:
             # notebook_path: /Workspace/Users/palash.patidar@koantekorg.onmicrosoft.com/DLT
             #   Test/Validations
-            notebook_path: ../src/Notebooks/demo_job_test
+            notebook_path: ../src/Notebooks/demo_job_test.py
             source: WORKSPACE
+      queue:
+        enabled: true
+
+    demo_test_2:
+      name: demo_test_2
+      tasks:
+        - task_key: dummy_run
+          notebook_task:
+            notebook_path: ../src/Notebooks/demo_job_test_2.py
+            source: WORKSPACE
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
       queue:
         enabled: true
 
