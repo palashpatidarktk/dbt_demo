@@ -118,4 +118,16 @@ resources:
       queue:
         enabled: true
 
+    demo_test_2:
+      name: demo_test_2
+      tasks:
+        - task_key: dummy_run
+          notebook_task:
+            notebook_path: ../src/Notebooks/demo_job_test_2.py
+            source: WORKSPACE
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+      queue:
+        enabled: true
+
 
