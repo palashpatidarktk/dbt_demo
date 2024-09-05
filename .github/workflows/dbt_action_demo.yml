@@ -45,6 +45,65 @@
 #     steps:
 #       - name: my-step
 #         run: echo "Hello World!"
+
+
+
+# name: workflows migration dev
+# concurrency: "1"
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - "**/*.yml"
+
+# jobs:
+#   test:
+#     name: "automated_testing"
+#     runs-on: ubuntu-latest
+#     environment: dev
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       - name: Set up Databricks CLI
+#         uses: databricks/setup-cli@main
+#       - name: Trigger Databricks testing job
+#         id: test-job
+
+#         run: |
+#             job_id="63243543003442"  # Replace with your testing job ID
+#             response=$(databricks jobs run-now $job_id)
+#             run_id=$(echo $response | jq -r '.run_id')
+#             echo "Test job run ID: $run_id"
+#             echo "::set-output name=run_id::$run_id"
+#         working-directory: .
+#         env:
+#             DATABRICKS_TOKEN: ${{secrets.DAB_SECRET}}
+#             DATABRICKS_BUNDLE_ENV: dev
+
+#   deploy:
+#               needs: test
+#               runs-on: ubuntu-latest
+#               if: success()  # This ensures deploy runs only if the test job was successful
+#               environment: dev
+#               steps:
+#               - name: Checkout code
+#                 uses: actions/checkout@v3
+
+#               - name: Set up Databricks CLI
+#                 uses: databricks/setup-cli@main
+                
+#               - name: Trigger Databricks bundle deploy job
+#                 run:  databricks bundle deploy
+#                 working-directory: .
+#                 env:
+#                     DATABRICKS_TOKEN: ${{secrets.DAB_SECRET}}
+#                     DATABRICKS_BUNDLE_ENV: dev
+
+
+
+
 name: workflows migration dev
 concurrency: "1"
 on:
@@ -55,8 +114,8 @@ on:
       - "**/*.yml"
 
 jobs:
-  test:
-    name: "automated_testing"
+  Validate:
+    name: "Validate_DAB_bundle"
     runs-on: ubuntu-latest
     environment: dev
     steps:
@@ -69,18 +128,14 @@ jobs:
         id: test-job
 
         run: |
-            job_id="63243543003442"  # Replace with your testing job ID
-            response=$(databricks jobs run-now $job_id)
-            run_id=$(echo $response | jq -r '.run_id')
-            echo "Test job run ID: $run_id"
-            echo "::set-output name=run_id::$run_id"
+            databricks bundle deploy
         working-directory: .
         env:
             DATABRICKS_TOKEN: ${{secrets.DAB_SECRET}}
             DATABRICKS_BUNDLE_ENV: dev
 
   deploy:
-              needs: test
+              needs: Validate
               runs-on: ubuntu-latest
               if: success()  # This ensures deploy runs only if the test job was successful
               environment: dev
@@ -93,6 +148,30 @@ jobs:
                 
               - name: Trigger Databricks bundle deploy job
                 run:  databricks bundle deploy
+                working-directory: .
+                env:
+                    DATABRICKS_TOKEN: ${{secrets.DAB_SECRET}}
+                    DATABRICKS_BUNDLE_ENV: dev
+
+  automated_test:
+              needs: deploy
+              runs-on: ubuntu-latest
+              if: success()  # This ensures deploy runs only if the test job was successful
+              environment: dev
+              steps:
+              - name: Checkout code
+                uses: actions/checkout@v3
+
+              - name: Set up Databricks CLI
+                uses: databricks/setup-cli@main
+                
+              - name: Trigger Databricks bundle deploy job
+                run: |
+                     job_id="63243543003442"  # Replace with your testing job ID
+                     response=$(databricks jobs run-now $job_id)
+                     run_id=$(echo $response | jq -r '.run_id')
+                     echo "Test job run ID: $run_id"
+                     echo "::set-output name=run_id::$run_id"
                 working-directory: .
                 env:
                     DATABRICKS_TOKEN: ${{secrets.DAB_SECRET}}
