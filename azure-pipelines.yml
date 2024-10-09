@@ -38,8 +38,8 @@ pool:
 
 variables:
   # Define environment-specific variable groups
-  - group: db-cicd-dev
-  - group: db-cicd-prod
+  - group: db_cicd_dev
+  #- group: db-cicd-prod
 
   # Variables for branch and folder names
   - name: branchName
