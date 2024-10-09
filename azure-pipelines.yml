@@ -3,17 +3,123 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
+# trigger:
+# - main
+
+# pool:
+#   vmImage: ubuntu-latest
+  
+# variables:
+#   - group: db-cicd-dev
+#   #- group: db-cicd-prod
+#   - name: branchName
+#     value: $(Build.SourceBranch)
+#   - name: folderName
+#     value: /Shared/palash_demo
+    
+# steps:
+# - script: echo Hello, world!
+#   displayName: 'Run a one-line script'
+
+# - script: |
+#     echo Add other tasks to build, test, and deploy your project.
+#     echo See https://aka.ms/yaml
+#   displayName: 'Run a multi-line script'
+
+
+  # Pipeline triggers on push to dev main branch
 trigger:
-- main
+  branches:
+    include:
+      - main
 
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:
+  # Define environment-specific variable groups
+  - group: db-cicd-dev
+  - group: db-cicd-prod
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  # Variables for branch and folder names
+  - name: branchName
+    value: $(Build.SourceBranch)
+  - name: folderName
+    value: /Shared/release
+  - name: targetEnvironment
+    value: 'dev'
+
+stages:
+  # Stage 1: Code Migration
+  - stage: MigrateCode
+    displayName: 'Migrate Code from Feature Branch to Dev'
+    jobs:
+      - job:
+        displayName: 'Migrate and Deploy Code'
+        pool:
+          vmImage: ubuntu-latest
+
+        steps:
+        # Echo the start of the pipeline
+        - script: echo "Starting code migration pipeline for branch $(branchName)"
+          displayName: 'Run a one-line script'
+
+        # Install Databricks CLI
+        - script: pip install databricks-cli
+          displayName: 'Install Databricks CLI'
+
+        # Configure Databricks CLI with tokens (loaded from variable groups)
+        - script: |
+            echo "$(databricksHost)
+            $(databricksToken)" | databricks configure --token
+          displayName: 'Configure Databricks CLI'
+
+        # Test the Databricks CLI connection by listing workspace contents
+        - script: |
+            databricks workspace ls
+          displayName: 'Test Databricks CLI'
+
+        # Download pipeline artifact for the code from feature branch
+        - task: DownloadPipelineArtifact@2
+          inputs:
+            source: current
+            artifact: "Databricks"
+            downloadPath: $(System.ArtifactsDirectory)/databricks
+
+        # List the contents of the downloaded artifact to confirm
+        - script: 'ls -la $(System.ArtifactsDirectory)/databricks'
+          displayName: 'List Downloaded Artifact'
+
+        # Import code to the dev Databricks environment
+        - script: |
+            BRANCH_NAME=$(echo $(branchName) | awk -F/ '{print $NF}')
+            FOLDER=$(echo /$(folderName)/$(targetEnvironment))
+            echo "Importing code to folder: $FOLDER"
+            databricks workspace import_dir --format AUTO $(System.ArtifactsDirectory)/databricks $FOLDER --exclude-hidden-files
+          displayName: 'Migrate Code to Dev Workspace'
+
+  # Stage 2: Validation (optional, if you want to include checks or tests)
+  - stage: ValidateDeployment
+    displayName: 'Validate Code Deployment in Dev'
+    dependsOn: MigrateCode
+    jobs:
+      - job:
+        displayName: 'Run Deployment Tests'
+        pool:
+          vmImage: ubuntu-latest
+
+        steps:
+        # Perform validation (could be anything from running tests to checking workspace integrity)
+        - script: echo "Running post-deployment validation"
+          displayName: 'Post Deployment Validation'
+
+        # Example: Test if key notebooks are present in the Databricks workspace
+        - script: |
+            databricks workspace ls /Shared/release/$(targetEnvironment)
+          displayName: 'List Workspace After Migration'
+
+        # Notify success
+        - script: echo "Code migration and validation completed successfully"
+          displayName: 'Notify Success'
+
+
