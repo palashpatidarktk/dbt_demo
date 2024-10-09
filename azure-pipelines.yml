@@ -79,23 +79,23 @@ stages:
             databricks workspace ls
           displayName: 'Test Databricks CLI'
 
-        # Download pipeline artifact for the code from feature branch
-        - task: DownloadPipelineArtifact@2
-          inputs:
-            source: current
-            artifact: "Databricks"
-            downloadPath: $(System.ArtifactsDirectory)/databricks
+        # # Download pipeline artifact for the code from feature branch
+        # - task: DownloadPipelineArtifact@2
+        #   inputs:
+        #     source: current
+        #     artifact: "Databricks"
+        #     downloadPath: $(System.ArtifactsDirectory)/databricks
 
-        # List the contents of the downloaded artifact to confirm
-        - script: 'ls -la $(System.ArtifactsDirectory)/databricks'
-          displayName: 'List Downloaded Artifact'
-
+        # # List the contents of the downloaded artifact to confirm
+        # - script: 'ls -la $(System.ArtifactsDirectory)/databricks'
+        #   displayName: 'List Downloaded Artifact'
+  
         # Import code to the dev Databricks environment
         - script: |
             BRANCH_NAME=$(echo $(branchName) | awk -F/ '{print $NF}')
             FOLDER=$(echo /$(folderName)/$(targetEnvironment))
             echo "Importing code to folder: $FOLDER"
-            databricks workspace import_dir --format AUTO $(System.ArtifactsDirectory)/databricks $FOLDER --exclude-hidden-files
+            databricks workspace import_dir --format AUTO $(System.DefaultWorkingDirectory) $FOLDER --exclude-hidden-files
           displayName: 'Migrate Code to Dev Workspace'
 
   # Stage 2: Validation (optional, if you want to include checks or tests)
